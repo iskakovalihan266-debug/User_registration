@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f1f5f9;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 360px;
+            max-width: 92%;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px #00000015;
+        }
+        h1 { text-align: center; color: #1e293b; }
+        .subtitle { text-align: center; color: #64748b; }
+        label { display: block; margin-top: 16px; margin-bottom: 6px; }
+        input {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+        }
+        button {
+            width: 100%;
+            margin-top: 22px;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover { background: #1d4ed8; }
+        button:disabled { opacity: 0.65; cursor: wait; }
+        #message { overflow-wrap: anywhere; font-size: 14px; text-align: center; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Create Account</h1>
+    <p class="subtitle">Register to get started</p>
+
+    <form id="registrationForm">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="name"
+               placeholder="Enter your name" required maxlength="100">
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email"
+               placeholder="Enter your email" required maxlength="254">
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password"
+               placeholder="At least 8 characters" minlength="8" required>
+
+        <button id="submitButton" type="submit">Register</button>
+    </form>
+    <p id="message" role="status" aria-live="polite"></p>
+</div>
+
+<script>
+    const form = document.getElementById("registrationForm");
+    const message = document.getElementById("message");
+    const button = document.getElementById("submitButton");
+
+    form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        message.textContent = "Please wait...";
+        message.style.color = "#64748b";
+        button.disabled = true;
+
+        try {
+            const response = await fetch("/register", {
+                method: "POST",
+                body: new FormData(form)
+            });
+            const result = await response.text();
+
+            message.textContent = result;
+            message.style.color = response.ok ? "green" : "red";
+
+            if (response.ok) {
+                form.reset();
+            }
+        } catch (error) {
+            message.textContent = "Server connection failed. Is the app running?";
+            message.style.color = "red";
+        } finally {
+            button.disabled = false;
+        }
+    });
+</script>
+</body>
+</html>
